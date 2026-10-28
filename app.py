@@ -71,6 +71,47 @@ Question: {question}
     response.raise_for_status()
     return response.json()["message"]["content"].strip()
 
+def correct_sql(question, schema, retrieved_context, failed_sql, error):
+    prompt = f"""
+You are correcting a failed SQLite query for a natural-language question.
+
+Rules:
+- Return only one SQL SELECT statement for supported questions.
+- Use only tables and columns in the supplied schema.
+- Do not generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE,
+  ATTACH, DETACH, PRAGMA, VACUUM, or multiple statements.
+- Do not explain the correction or use Markdown fences.
+- If the question is unsupported, return UNSUPPORTED: followed by
+  a brief explanation.
+- Fix the specific error; do not change the question's meaning.
+
+Full database schema:
+{schema}
+
+Retrieved schema context:
+{retrieved_context}
+
+Original question:
+{question}
+
+Failed SQL:
+{failed_sql}
+
+Error:
+{error}
+"""
+    response = requests.post(
+        OLLAMA_URL,
+        json={
+            "model": MODEL,
+            "messages": [{"role": "user", "content": prompt}],
+            "stream": False,
+        },
+        timeout=120,
+    )
+    response.raise_for_status()
+    return response.json()["message"]["content"].strip()
+
 
 def validate_sql(sql):
     cleaned = sql.strip()
@@ -142,8 +183,45 @@ if st.button(
         st.subheader("Generated SQL")
         st.code(generated, language="sql")
 
-        safe_sql = validate_sql(generated)
-        columns, rows = execute_query(safe_sql)
+        
+        MAX_CORRECTION_ATTEMPTS = 2
+
+        current_sql = generated
+        columns, rows = None, None
+
+        for attempt in range(MAX_CORRECTION_ATTEMPTS + 1):
+            if current_sql.strip().upper().startswith("UNSUPPORTED:"):
+                st.warning(
+                    current_sql.strip()[len("UNSUPPORTED:"):].strip()
+                )
+                st.stop()
+
+            try:
+                safe_sql = validate_sql(current_sql)
+                columns, rows = execute_query(safe_sql)
+                break
+            except (ValueError, sqlite3.Error) as exc:
+                if attempt == MAX_CORRECTION_ATTEMPTS:
+                    raise
+
+                st.warning(
+                    f"SQL attempt {attempt + 1} failed. "
+                    f"Requesting correction {attempt + 1} of "
+                    f"{MAX_CORRECTION_ATTEMPTS}..."
+                )
+
+                with st.spinner("Correcting the SQL..."):
+                    current_sql = correct_sql(
+                        question=question,
+                        schema=schema,
+                        retrieved_context=retrieved_context,
+                        failed_sql=current_sql,
+                        error=str(exc),
+                    )
+
+                st.subheader(f"Corrected SQL — attempt {attempt + 1}")
+                st.code(current_sql, language="sql")
+
 
         st.subheader("Query results")
         st.dataframe(
