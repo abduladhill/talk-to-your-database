@@ -1,3 +1,4 @@
 streamlit
-streamlit
 requests
+sentence-transformers
+faiss-cpu
