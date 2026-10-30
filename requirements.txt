@@ -2,3 +2,4 @@ streamlit
 requests
 sentence-transformers
 faiss-cpu
+sqlglot
