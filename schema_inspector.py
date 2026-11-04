@@ -1,20 +1,21 @@
-
 import sqlite3
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "sample.db"
 
 
-def inspect_schema():
-    if not DB_PATH.exists():
+def inspect_schema(db_path: Path = DB_PATH):
+    target_path = Path(db_path) if db_path else DB_PATH
+    if not target_path.exists():
         raise FileNotFoundError(
-            f"Database not found: {DB_PATH}. "
+            f"Database not found: {target_path}. "
             "Run create_sample_db.py first."
         )
 
     schema = {}
 
-    with sqlite3.connect(DB_PATH) as conn:
+    conn = sqlite3.connect(target_path)
+    try:
         conn.execute("PRAGMA foreign_keys = ON")
 
         tables = conn.execute("""
@@ -54,6 +55,8 @@ def inspect_schema():
                     for fk in foreign_keys
                 ],
             }
+    finally:
+        conn.close()
 
     return schema
 

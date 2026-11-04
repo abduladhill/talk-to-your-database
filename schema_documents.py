@@ -1,9 +1,11 @@
+from pathlib import Path
+from schema_inspector import DB_PATH, inspect_schema
+from value_profiler import build_value_documents
 
-from schema_inspector import inspect_schema
 
-
-def build_schema_documents():
-    schema = inspect_schema()
+def build_schema_documents(db_path: Path = DB_PATH):
+    target_path = Path(db_path) if db_path else DB_PATH
+    schema = inspect_schema(db_path=target_path)
     documents = []
 
     for table_name, details in schema.items():
@@ -46,6 +48,7 @@ def build_schema_documents():
                 "content": column_document,
             })
 
+    documents.extend(build_value_documents(db_path=target_path))
     return documents
 
 

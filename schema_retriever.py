@@ -1,21 +1,37 @@
-
-import faiss
+import os
+from pathlib import Path
 import numpy as np
-from sentence_transformers import SentenceTransformer
+import faiss
 
+# Optimize local model loading without slow remote metadata checks
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
+from sentence_transformers import SentenceTransformer
 from schema_documents import build_schema_documents
+from schema_inspector import DB_PATH
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+_EMBEDDING_MODEL = None
 
 
-def build_retriever():
-    documents = build_schema_documents()
+def get_embedding_model():
+    """Lazily load and cache the SentenceTransformer model in memory."""
+    global _EMBEDDING_MODEL
+    if _EMBEDDING_MODEL is None:
+        print(f"Loading embedding model: {MODEL_NAME}")
+        _EMBEDDING_MODEL = SentenceTransformer(MODEL_NAME)
+    return _EMBEDDING_MODEL
+
+
+def build_retriever(db_path: Path = DB_PATH):
+    target_path = Path(db_path) if db_path else DB_PATH
+    documents = build_schema_documents(db_path=target_path)
 
     if not documents:
         raise ValueError("No schema documents were generated.")
 
-    print(f"Loading embedding model: {MODEL_NAME}")
-    model = SentenceTransformer(MODEL_NAME)
+    model = get_embedding_model()
 
     texts = [doc["content"] for doc in documents]
     embeddings = model.encode(
@@ -28,6 +44,11 @@ def build_retriever():
     index.add(embeddings)
 
     return model, index, documents
+
+
+def refresh_retriever(db_path: Path = DB_PATH):
+    """Rebuild schema documents and FAISS index from the live database."""
+    return build_retriever(db_path=db_path)
 
 
 def search_schema(question, model, index, documents, top_k=3):

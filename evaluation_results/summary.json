@@ -1,0 +1,21 @@
+
+[
+  {
+    "configuration": "baseline",
+    "question_count": 30,
+    "correct_count": 22,
+    "accuracy": 0.7333333333333333
+  },
+  {
+    "configuration": "rag",
+    "question_count": 30,
+    "correct_count": 22,
+    "accuracy": 0.7333333333333333
+  },
+  {
+    "configuration": "full_system",
+    "question_count": 30,
+    "correct_count": 23,
+    "accuracy": 0.7666666666666667
+  }
+]

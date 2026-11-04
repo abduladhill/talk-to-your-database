@@ -1,0 +1,65 @@
+{
+  "cold_start": {
+    "retriever_build_ms": 1235.95,
+    "sql_generation_sec": 15.139,
+    "execution_ms": 26.65,
+    "total_response_sec": 16.402
+  },
+  "warm_runs": [
+    {
+      "archetype": "Simple SELECT",
+      "query": "Show all employee names and their salaries.",
+      "generated_sql": "SELECT name, salary FROM employees",
+      "row_count": 5,
+      "retrieval_latency_ms": 37.37,
+      "generation_latency_sec": 11.894,
+      "execution_latency_ms": 9.1,
+      "total_latency_sec": 11.94
+    },
+    {
+      "archetype": "Filtering",
+      "query": "Find employees in Engineering with salary above 45000.",
+      "generated_sql": "SELECT * FROM employees WHERE department = 'Engineering' AND salary > 45000.0",
+      "row_count": 1,
+      "retrieval_latency_ms": 40.24,
+      "generation_latency_sec": 22.63,
+      "execution_latency_ms": 4.17,
+      "total_latency_sec": 22.674
+    },
+    {
+      "archetype": "Aggregation",
+      "query": "What is the total salary expenditure across all departments?",
+      "generated_sql": "SELECT SUM(salary) AS total_salary FROM employees",
+      "row_count": 1,
+      "retrieval_latency_ms": 32.07,
+      "generation_latency_sec": 40.212,
+      "execution_latency_ms": 2.7,
+      "total_latency_sec": 40.247
+    },
+    {
+      "archetype": "JOIN",
+      "query": "Show pairs of distinct employees who work in the same department.",
+      "generated_sql": "SELECT e1.name, e2.name, e1.department FROM employees AS e1 JOIN employees AS e2 ON e1.department = e2.department AND e1.id < e2.id",
+      "row_count": 2,
+      "retrieval_latency_ms": 12.62,
+      "generation_latency_sec": 33.466,
+      "execution_latency_ms": 5.87,
+      "total_latency_sec": 33.484
+    },
+    {
+      "archetype": "Complex HAVING",
+      "query": "Which departments have more than one employee and an average salary over 35000?",
+      "generated_sql": "SELECT department, COUNT(*) AS employee_count, AVG(salary) AS average_salary FROM employees GROUP BY department HAVING COUNT(*) > 1 AND AVG(salary) > 35000",
+      "row_count": 2,
+      "retrieval_latency_ms": 22.6,
+      "generation_latency_sec": 31.541,
+      "execution_latency_ms": 5.09,
+      "total_latency_sec": 31.568
+    }
+  ],
+  "average_warm_generation_sec": 27.949,
+  "average_warm_retrieval_ms": 28.98,
+  "average_warm_execution_ms": 5.39,
+  "average_warm_total_sec": 27.983,
+  "memory_traced_peak_mb": 98.17
+}

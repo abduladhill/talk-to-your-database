@@ -1,0 +1,13 @@
+[
+  {
+    "configuration": "full_system",
+    "question_count": 47,
+    "correct_count": 33,
+    "exact_accuracy": 0.7021,
+    "execution_accuracy": 0.9574,
+    "sql_validity_rate": 0.7447,
+    "ambiguity_detection_rate": 0.75,
+    "unsupported_detection_rate": 1.0,
+    "average_latency_seconds": 15.41
+  }
+]

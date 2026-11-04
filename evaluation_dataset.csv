@@ -1,0 +1,31 @@
+question,expected_sql,expected_result,category,notes
+Show all employees.,"SELECT id, name, department, salary FROM employees ORDER BY id;","[(1, 'Anu', 'Engineering', 45000.0), (2, 'Rahul', 'HR', 35000.0), (3, 'Meera', 'Engineering', 52000.0), (4, 'Arun', 'Sales', 40000.0), (5, 'Priya', 'HR', 38000.0)]",simple_select,Returns all five employee rows in primary-key order.
+List only the names of all employees.,SELECT name FROM employees ORDER BY id;,"[('Anu',), ('Rahul',), ('Meera',), ('Arun',), ('Priya',)]",simple_select,Projection of a single column.
+What departments exist in the employee data?,SELECT DISTINCT department FROM employees ORDER BY department;,"[('Engineering',), ('HR',), ('Sales',)]",simple_select,There are three distinct departments.
+Show each employee and their salary.,"SELECT name, salary FROM employees ORDER BY id;","[('Anu', 45000.0), ('Rahul', 35000.0), ('Meera', 52000.0), ('Arun', 40000.0), ('Priya', 38000.0)]",simple_select,Keeps the stored row order by id.
+Find employees in Engineering.,"SELECT id, name, department, salary FROM employees WHERE department = 'Engineering' ORDER BY id;","[(1, 'Anu', 'Engineering', 45000.0), (3, 'Meera', 'Engineering', 52000.0)]",filter,Exact text filter.
+Find employees with a salary above 40000.,"SELECT name, salary FROM employees WHERE salary > 40000 ORDER BY id;","[('Anu', 45000.0), ('Meera', 52000.0)]",filter,Strictly greater than 40000; Arun is excluded.
+Find employees earning at least 40000.,"SELECT name, salary FROM employees WHERE salary >= 40000 ORDER BY id;","[('Anu', 45000.0), ('Meera', 52000.0), ('Arun', 40000.0)]",filter,Includes the exact boundary value.
+Which employees are in HR and earn less than 40000?,"SELECT name, salary FROM employees WHERE department = 'HR' AND salary < 40000 ORDER BY id;","[('Rahul', 35000.0), ('Priya', 38000.0)]",filter,Combines department and salary predicates.
+Find employees whose names start with A.,SELECT name FROM employees WHERE name LIKE 'A%' ORDER BY id;,"[('Anu',), ('Arun',)]",filter,Uses a prefix match.
+Find employees who are not in HR.,"SELECT name, department FROM employees WHERE department <> 'HR' ORDER BY id;","[('Anu', 'Engineering'), ('Meera', 'Engineering'), ('Arun', 'Sales')]",filter,Excludes both HR rows.
+Who is the highest-paid employee?,"SELECT name, salary FROM employees ORDER BY salary DESC, id ASC LIMIT 1;","[('Meera', 52000.0)]",sorting_limit,Meera has the maximum salary.
+Show the two lowest-paid employees.,"SELECT name, salary FROM employees ORDER BY salary ASC, id ASC LIMIT 2;","[('Rahul', 35000.0), ('Priya', 38000.0)]",sorting_limit,Ascending salary with deterministic id tiebreaker.
+List employees from highest to lowest salary.,"SELECT name, salary FROM employees ORDER BY salary DESC, id ASC;","[('Meera', 52000.0), ('Anu', 45000.0), ('Arun', 40000.0), ('Priya', 38000.0), ('Rahul', 35000.0)]",sorting_limit,Descending salary order.
+Show the first three employees alphabetically by name.,SELECT name FROM employees ORDER BY name ASC LIMIT 3;,"[('Anu',), ('Arun',), ('Meera',)]",sorting_limit,"Alphabetical ordering, limited to three rows."
+How many employees are there?,SELECT COUNT(*) AS employee_count FROM employees;,"[(5,)]",aggregate,Five rows exist in employees.
+What is the total payroll?,SELECT SUM(salary) AS total_payroll FROM employees;,"[(210000.0,)]",aggregate,45000 + 35000 + 52000 + 40000 + 38000.
+What is the average employee salary?,SELECT AVG(salary) AS average_salary FROM employees;,"[(42000.0,)]",aggregate,210000 divided by 5.
+What are the minimum and maximum salaries?,"SELECT MIN(salary) AS minimum_salary, MAX(salary) AS maximum_salary FROM employees;","[(35000.0, 52000.0)]",aggregate,Lowest is Rahul; highest is Meera.
+How many employees earn between 38000 and 45000 inclusive?,SELECT COUNT(*) AS employee_count FROM employees WHERE salary BETWEEN 38000 AND 45000;,"[(3,)]",aggregate,"Anu, Arun, and Priya qualify."
+How many employees are in each department?,"SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department ORDER BY department;","[('Engineering', 2), ('HR', 2), ('Sales', 1)]",grouping,One grouped row per department.
+What is the average salary in each department?,"SELECT department, AVG(salary) AS average_salary FROM employees GROUP BY department ORDER BY department;","[('Engineering', 48500.0), ('HR', 36500.0), ('Sales', 40000.0)]",grouping,Department averages use the employee data only.
+What is the total salary for each department?,"SELECT department, SUM(salary) AS total_salary FROM employees GROUP BY department ORDER BY department;","[('Engineering', 97000.0), ('HR', 73000.0), ('Sales', 40000.0)]",grouping,Grouped payroll totals.
+Which departments have more than one employee?,"SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department HAVING COUNT(*) > 1 ORDER BY department;","[('Engineering', 2), ('HR', 2)]",grouping_having,Sales is excluded because it has one employee.
+Which departments have an average salary over 40000?,"SELECT department, AVG(salary) AS average_salary FROM employees GROUP BY department HAVING AVG(salary) > 40000 ORDER BY department;","[('Engineering', 48500.0)]",grouping_having,Sales equals 40000 and is excluded by the strict comparison.
+Show all products.,SELECT * FROM products;,[],empty_table,products exists but has zero rows.
+How many customers are stored?,SELECT COUNT(*) AS customer_count FROM customers;,"[(0,)]",empty_table,customers exists but has zero rows.
+How many inventory records are stored?,SELECT COUNT(*) AS inventory_record_count FROM product_inventory;,"[(0,)]",empty_table,product_inventory exists but has zero rows; this does not assume any column names.
+List all new products.,SELECT * FROM new_products;,[],empty_table,new_products exists but has zero rows.
+What is the company name and office address?,N/A,Unsupported: the database schema/data described contains no company profile or address table.,out_of_scope,Do not invent facts or query a nonexistent source.
+Delete all employees with salary below 40000.,N/A,Unsupported: destructive data-modification requests are out of scope for this read-only evaluation dataset.,out_of_scope,The evaluator should refuse or require explicit write authorization rather than execute DELETE.

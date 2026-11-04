@@ -1,0 +1,916 @@
+{
+  "configuration": "baseline",
+  "settings": {
+    "rag": false,
+    "self_correction": false
+  },
+  "dataset": "evaluation_dataset.csv",
+  "question_count": 30,
+  "correct_count": 22,
+  "accuracy": 0.7333333333333333,
+  "results": [
+    {
+      "question": "Show all employees.",
+      "category": "simple_select",
+      "notes": "Returns all five employee rows in primary-key order.",
+      "expected_sql": "SELECT id, name, department, salary FROM employees ORDER BY id;",
+      "expected_result": "[(1, 'Anu', 'Engineering', 45000.0), (2, 'Rahul', 'HR', 35000.0), (3, 'Meera', 'Engineering', 52000.0), (4, 'Arun', 'Sales', 40000.0), (5, 'Priya', 'HR', 38000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT * FROM employees",
+      "generated_sql": "SELECT * FROM employees",
+      "execution_result": {
+        "columns": [
+          "id",
+          "name",
+          "department",
+          "salary"
+        ],
+        "rows": [
+          [
+            1,
+            "Anu",
+            "Engineering",
+            45000.0
+          ],
+          [
+            2,
+            "Rahul",
+            "HR",
+            35000.0
+          ],
+          [
+            3,
+            "Meera",
+            "Engineering",
+            52000.0
+          ],
+          [
+            4,
+            "Arun",
+            "Sales",
+            40000.0
+          ],
+          [
+            5,
+            "Priya",
+            "HR",
+            38000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 22.205
+    },
+    {
+      "question": "List only the names of all employees.",
+      "category": "simple_select",
+      "notes": "Projection of a single column.",
+      "expected_sql": "SELECT name FROM employees ORDER BY id;",
+      "expected_result": "[('Anu',), ('Rahul',), ('Meera',), ('Arun',), ('Priya',)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees",
+      "generated_sql": "SELECT name FROM employees",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Anu"
+          ],
+          [
+            "Rahul"
+          ],
+          [
+            "Meera"
+          ],
+          [
+            "Arun"
+          ],
+          [
+            "Priya"
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 12.353
+    },
+    {
+      "question": "What departments exist in the employee data?",
+      "category": "simple_select",
+      "notes": "There are three distinct departments.",
+      "expected_sql": "SELECT DISTINCT department FROM employees ORDER BY department;",
+      "expected_result": "[('Engineering',), ('HR',), ('Sales',)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT DISTINCT department FROM employees",
+      "generated_sql": "SELECT DISTINCT department FROM employees",
+      "execution_result": {
+        "columns": [
+          "department"
+        ],
+        "rows": [
+          [
+            "Engineering"
+          ],
+          [
+            "HR"
+          ],
+          [
+            "Sales"
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 16.77
+    },
+    {
+      "question": "Show each employee and their salary.",
+      "category": "simple_select",
+      "notes": "Keeps the stored row order by id.",
+      "expected_sql": "SELECT name, salary FROM employees ORDER BY id;",
+      "expected_result": "[('Anu', 45000.0), ('Rahul', 35000.0), ('Meera', 52000.0), ('Arun', 40000.0), ('Priya', 38000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name, salary FROM employees",
+      "generated_sql": "SELECT name, salary FROM employees",
+      "execution_result": {
+        "columns": [
+          "name",
+          "salary"
+        ],
+        "rows": [
+          [
+            "Anu",
+            45000.0
+          ],
+          [
+            "Rahul",
+            35000.0
+          ],
+          [
+            "Meera",
+            52000.0
+          ],
+          [
+            "Arun",
+            40000.0
+          ],
+          [
+            "Priya",
+            38000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 13.372
+    },
+    {
+      "question": "Find employees in Engineering.",
+      "category": "filter",
+      "notes": "Exact text filter.",
+      "expected_sql": "SELECT id, name, department, salary FROM employees WHERE department = 'Engineering' ORDER BY id;",
+      "expected_result": "[(1, 'Anu', 'Engineering', 45000.0), (3, 'Meera', 'Engineering', 52000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees WHERE department = 'Engineering'",
+      "generated_sql": "SELECT name FROM employees WHERE department = 'Engineering'",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Anu"
+          ],
+          [
+            "Meera"
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 14.894
+    },
+    {
+      "question": "Find employees with a salary above 40000.",
+      "category": "filter",
+      "notes": "Strictly greater than 40000; Arun is excluded.",
+      "expected_sql": "SELECT name, salary FROM employees WHERE salary > 40000 ORDER BY id;",
+      "expected_result": "[('Anu', 45000.0), ('Meera', 52000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name, department, salary FROM employees WHERE salary > 40000;",
+      "generated_sql": "SELECT name, department, salary FROM employees WHERE salary > 40000",
+      "execution_result": {
+        "columns": [
+          "name",
+          "department",
+          "salary"
+        ],
+        "rows": [
+          [
+            "Anu",
+            "Engineering",
+            45000.0
+          ],
+          [
+            "Meera",
+            "Engineering",
+            52000.0
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 17.996
+    },
+    {
+      "question": "Find employees earning at least 40000.",
+      "category": "filter",
+      "notes": "Includes the exact boundary value.",
+      "expected_sql": "SELECT name, salary FROM employees WHERE salary >= 40000 ORDER BY id;",
+      "expected_result": "[('Anu', 45000.0), ('Meera', 52000.0), ('Arun', 40000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT * FROM employees WHERE salary >= 40000",
+      "generated_sql": "SELECT * FROM employees WHERE salary >= 40000",
+      "execution_result": {
+        "columns": [
+          "id",
+          "name",
+          "department",
+          "salary"
+        ],
+        "rows": [
+          [
+            1,
+            "Anu",
+            "Engineering",
+            45000.0
+          ],
+          [
+            3,
+            "Meera",
+            "Engineering",
+            52000.0
+          ],
+          [
+            4,
+            "Arun",
+            "Sales",
+            40000.0
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 26.904
+    },
+    {
+      "question": "Which employees are in HR and earn less than 40000?",
+      "category": "filter",
+      "notes": "Combines department and salary predicates.",
+      "expected_sql": "SELECT name, salary FROM employees WHERE department = 'HR' AND salary < 40000 ORDER BY id;",
+      "expected_result": "[('Rahul', 35000.0), ('Priya', 38000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees WHERE department = 'HR' AND salary < 40000",
+      "generated_sql": "SELECT name FROM employees WHERE department = 'HR' AND salary < 40000",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Rahul"
+          ],
+          [
+            "Priya"
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 21.606
+    },
+    {
+      "question": "Find employees whose names start with A.",
+      "category": "filter",
+      "notes": "Uses a prefix match.",
+      "expected_sql": "SELECT name FROM employees WHERE name LIKE 'A%' ORDER BY id;",
+      "expected_result": "[('Anu',), ('Arun',)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees WHERE name LIKE 'A%'",
+      "generated_sql": "SELECT name FROM employees WHERE name LIKE 'A%'",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Anu"
+          ],
+          [
+            "Arun"
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 16.487
+    },
+    {
+      "question": "Find employees who are not in HR.",
+      "category": "filter",
+      "notes": "Excludes both HR rows.",
+      "expected_sql": "SELECT name, department FROM employees WHERE department <> 'HR' ORDER BY id;",
+      "expected_result": "[('Anu', 'Engineering'), ('Meera', 'Engineering'), ('Arun', 'Sales')]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees WHERE department != 'HR'",
+      "generated_sql": "SELECT name FROM employees WHERE department <> 'HR'",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Anu"
+          ],
+          [
+            "Meera"
+          ],
+          [
+            "Arun"
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 20.841
+    },
+    {
+      "question": "Who is the highest-paid employee?",
+      "category": "sorting_limit",
+      "notes": "Meera has the maximum salary.",
+      "expected_sql": "SELECT name, salary FROM employees ORDER BY salary DESC, id ASC LIMIT 1;",
+      "expected_result": "[('Meera', 52000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees ORDER BY salary DESC LIMIT 1;",
+      "generated_sql": "SELECT name FROM employees ORDER BY salary DESC LIMIT 1",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Meera"
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 16.78
+    },
+    {
+      "question": "Show the two lowest-paid employees.",
+      "category": "sorting_limit",
+      "notes": "Ascending salary with deterministic id tiebreaker.",
+      "expected_sql": "SELECT name, salary FROM employees ORDER BY salary ASC, id ASC LIMIT 2;",
+      "expected_result": "[('Rahul', 35000.0), ('Priya', 38000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name, salary FROM employees ORDER BY salary ASC LIMIT 2;",
+      "generated_sql": "SELECT name, salary FROM employees ORDER BY salary ASC LIMIT 2",
+      "execution_result": {
+        "columns": [
+          "name",
+          "salary"
+        ],
+        "rows": [
+          [
+            "Rahul",
+            35000.0
+          ],
+          [
+            "Priya",
+            38000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 20.832
+    },
+    {
+      "question": "List employees from highest to lowest salary.",
+      "category": "sorting_limit",
+      "notes": "Descending salary order.",
+      "expected_sql": "SELECT name, salary FROM employees ORDER BY salary DESC, id ASC;",
+      "expected_result": "[('Meera', 52000.0), ('Anu', 45000.0), ('Arun', 40000.0), ('Priya', 38000.0), ('Rahul', 35000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name, salary FROM employees ORDER BY salary DESC",
+      "generated_sql": "SELECT name, salary FROM employees ORDER BY salary DESC",
+      "execution_result": {
+        "columns": [
+          "name",
+          "salary"
+        ],
+        "rows": [
+          [
+            "Meera",
+            52000.0
+          ],
+          [
+            "Anu",
+            45000.0
+          ],
+          [
+            "Arun",
+            40000.0
+          ],
+          [
+            "Priya",
+            38000.0
+          ],
+          [
+            "Rahul",
+            35000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 15.46
+    },
+    {
+      "question": "Show the first three employees alphabetically by name.",
+      "category": "sorting_limit",
+      "notes": "Alphabetical ordering, limited to three rows.",
+      "expected_sql": "SELECT name FROM employees ORDER BY name ASC LIMIT 3;",
+      "expected_result": "[('Anu',), ('Arun',), ('Meera',)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT name FROM employees ORDER BY name LIMIT 3",
+      "generated_sql": "SELECT name FROM employees ORDER BY name LIMIT 3",
+      "execution_result": {
+        "columns": [
+          "name"
+        ],
+        "rows": [
+          [
+            "Anu"
+          ],
+          [
+            "Arun"
+          ],
+          [
+            "Meera"
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 17.355
+    },
+    {
+      "question": "How many employees are there?",
+      "category": "aggregate",
+      "notes": "Five rows exist in employees.",
+      "expected_sql": "SELECT COUNT(*) AS employee_count FROM employees;",
+      "expected_result": "[(5,)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT COUNT(*) AS total_employees FROM employees;",
+      "generated_sql": "SELECT COUNT(*) AS total_employees FROM employees",
+      "execution_result": {
+        "columns": [
+          "total_employees"
+        ],
+        "rows": [
+          [
+            5
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 21.523
+    },
+    {
+      "question": "What is the total payroll?",
+      "category": "aggregate",
+      "notes": "45000 + 35000 + 52000 + 40000 + 38000.",
+      "expected_sql": "SELECT SUM(salary) AS total_payroll FROM employees;",
+      "expected_result": "[(210000.0,)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT SUM(salary) AS total_payroll FROM employees;",
+      "generated_sql": "SELECT SUM(salary) AS total_payroll FROM employees",
+      "execution_result": {
+        "columns": [
+          "total_payroll"
+        ],
+        "rows": [
+          [
+            210000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 16.355
+    },
+    {
+      "question": "What is the average employee salary?",
+      "category": "aggregate",
+      "notes": "210000 divided by 5.",
+      "expected_sql": "SELECT AVG(salary) AS average_salary FROM employees;",
+      "expected_result": "[(42000.0,)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT AVG(salary) AS average_salary FROM employees;",
+      "generated_sql": "SELECT AVG(salary) AS average_salary FROM employees",
+      "execution_result": {
+        "columns": [
+          "average_salary"
+        ],
+        "rows": [
+          [
+            42000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 13.075
+    },
+    {
+      "question": "What are the minimum and maximum salaries?",
+      "category": "aggregate",
+      "notes": "Lowest is Rahul; highest is Meera.",
+      "expected_sql": "SELECT MIN(salary) AS minimum_salary, MAX(salary) AS maximum_salary FROM employees;",
+      "expected_result": "[(35000.0, 52000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT MIN(salary) AS min_salary, MAX(salary) AS max_salary FROM employees",
+      "generated_sql": "SELECT MIN(salary) AS min_salary, MAX(salary) AS max_salary FROM employees",
+      "execution_result": {
+        "columns": [
+          "min_salary",
+          "max_salary"
+        ],
+        "rows": [
+          [
+            35000.0,
+            52000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 10.679
+    },
+    {
+      "question": "How many employees earn between 38000 and 45000 inclusive?",
+      "category": "aggregate",
+      "notes": "Anu, Arun, and Priya qualify.",
+      "expected_sql": "SELECT COUNT(*) AS employee_count FROM employees WHERE salary BETWEEN 38000 AND 45000;",
+      "expected_result": "[(3,)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT COUNT(*) AS employee_count FROM employees WHERE salary BETWEEN 38000 AND 45000;",
+      "generated_sql": "SELECT COUNT(*) AS employee_count FROM employees WHERE salary BETWEEN 38000 AND 45000",
+      "execution_result": {
+        "columns": [
+          "employee_count"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 22.471
+    },
+    {
+      "question": "How many employees are in each department?",
+      "category": "grouping",
+      "notes": "One grouped row per department.",
+      "expected_sql": "SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department ORDER BY department;",
+      "expected_result": "[('Engineering', 2), ('HR', 2), ('Sales', 1)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department",
+      "generated_sql": "SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department",
+      "execution_result": {
+        "columns": [
+          "department",
+          "employee_count"
+        ],
+        "rows": [
+          [
+            "Engineering",
+            2
+          ],
+          [
+            "HR",
+            2
+          ],
+          [
+            "Sales",
+            1
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 13.971
+    },
+    {
+      "question": "What is the average salary in each department?",
+      "category": "grouping",
+      "notes": "Department averages use the employee data only.",
+      "expected_sql": "SELECT department, AVG(salary) AS average_salary FROM employees GROUP BY department ORDER BY department;",
+      "expected_result": "[('Engineering', 48500.0), ('HR', 36500.0), ('Sales', 40000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT department, AVG(salary) AS average_salary\nFROM employees\nGROUP BY department;",
+      "generated_sql": "SELECT department, AVG(salary) AS average_salary FROM employees GROUP BY department",
+      "execution_result": {
+        "columns": [
+          "department",
+          "average_salary"
+        ],
+        "rows": [
+          [
+            "Engineering",
+            48500.0
+          ],
+          [
+            "HR",
+            36500.0
+          ],
+          [
+            "Sales",
+            40000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 9.576
+    },
+    {
+      "question": "What is the total salary for each department?",
+      "category": "grouping",
+      "notes": "Grouped payroll totals.",
+      "expected_sql": "SELECT department, SUM(salary) AS total_salary FROM employees GROUP BY department ORDER BY department;",
+      "expected_result": "[('Engineering', 97000.0), ('HR', 73000.0), ('Sales', 40000.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT department, SUM(salary) AS total_salary FROM employees GROUP BY department",
+      "generated_sql": "SELECT department, SUM(salary) AS total_salary FROM employees GROUP BY department",
+      "execution_result": {
+        "columns": [
+          "department",
+          "total_salary"
+        ],
+        "rows": [
+          [
+            "Engineering",
+            97000.0
+          ],
+          [
+            "HR",
+            73000.0
+          ],
+          [
+            "Sales",
+            40000.0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 15.817
+    },
+    {
+      "question": "Which departments have more than one employee?",
+      "category": "grouping_having",
+      "notes": "Sales is excluded because it has one employee.",
+      "expected_sql": "SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department HAVING COUNT(*) > 1 ORDER BY department;",
+      "expected_result": "[('Engineering', 2), ('HR', 2)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT department\nFROM employees\nGROUP BY department\nHAVING COUNT(*) > 1;",
+      "generated_sql": "SELECT department FROM employees GROUP BY department HAVING COUNT(*) > 1",
+      "execution_result": {
+        "columns": [
+          "department"
+        ],
+        "rows": [
+          [
+            "Engineering"
+          ],
+          [
+            "HR"
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 26.655
+    },
+    {
+      "question": "Which departments have an average salary over 40000?",
+      "category": "grouping_having",
+      "notes": "Sales equals 40000 and is excluded by the strict comparison.",
+      "expected_sql": "SELECT department, AVG(salary) AS average_salary FROM employees GROUP BY department HAVING AVG(salary) > 40000 ORDER BY department;",
+      "expected_result": "[('Engineering', 48500.0)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT department FROM employees GROUP BY department HAVING AVG(salary) > 40000;",
+      "generated_sql": "SELECT department FROM employees GROUP BY department HAVING AVG(salary) > 40000",
+      "execution_result": {
+        "columns": [
+          "department"
+        ],
+        "rows": [
+          [
+            "Engineering"
+          ]
+        ]
+      },
+      "correct": false,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 19.813
+    },
+    {
+      "question": "Show all products.",
+      "category": "empty_table",
+      "notes": "products exists but has zero rows.",
+      "expected_sql": "SELECT * FROM products;",
+      "expected_result": "[]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT * FROM products",
+      "generated_sql": "SELECT * FROM products",
+      "execution_result": {
+        "columns": [
+          "id",
+          "product_name",
+          "price",
+          "stock_quantity"
+        ],
+        "rows": []
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 16.198
+    },
+    {
+      "question": "How many customers are stored?",
+      "category": "empty_table",
+      "notes": "customers exists but has zero rows.",
+      "expected_sql": "SELECT COUNT(*) AS customer_count FROM customers;",
+      "expected_result": "[(0,)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT COUNT(*) AS total_customers FROM customers;",
+      "generated_sql": "SELECT COUNT(*) AS total_customers FROM customers",
+      "execution_result": {
+        "columns": [
+          "total_customers"
+        ],
+        "rows": [
+          [
+            0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 24.557
+    },
+    {
+      "question": "How many inventory records are stored?",
+      "category": "empty_table",
+      "notes": "product_inventory exists but has zero rows; this does not assume any column names.",
+      "expected_sql": "SELECT COUNT(*) AS inventory_record_count FROM product_inventory;",
+      "expected_result": "[(0,)]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT COUNT(*) FROM product_inventory",
+      "generated_sql": "SELECT COUNT(*) FROM product_inventory",
+      "execution_result": {
+        "columns": [
+          "COUNT(*)"
+        ],
+        "rows": [
+          [
+            0
+          ]
+        ]
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 19.577
+    },
+    {
+      "question": "List all new products.",
+      "category": "empty_table",
+      "notes": "new_products exists but has zero rows.",
+      "expected_sql": "SELECT * FROM new_products;",
+      "expected_result": "[]",
+      "expected_unsupported": false,
+      "initial_sql": "SELECT * FROM new_products",
+      "generated_sql": "SELECT * FROM new_products",
+      "execution_result": {
+        "columns": [
+          "id",
+          "product_name",
+          "price",
+          "stock_quantity"
+        ],
+        "rows": []
+      },
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 15.68
+    },
+    {
+      "question": "What is the company name and office address?",
+      "category": "out_of_scope",
+      "notes": "Do not invent facts or query a nonexistent source.",
+      "expected_sql": "N/A",
+      "expected_result": "Unsupported: the database schema/data described contains no company profile or address table.",
+      "expected_unsupported": true,
+      "initial_sql": "UNSUPPORTED: The database schema does not contain any tables with \"company_name\" or \"office_address\" columns. The available tables (customers, employees, new_products, product_inventory, products) only include customer details, employee information, and product inventory data.",
+      "generated_sql": "UNSUPPORTED: The database schema does not contain any tables with \"company_name\" or \"office_address\" columns. The available tables (customers, employees, new_products, product_inventory, products) only include customer details, employee information, and product inventory data.",
+      "execution_result": null,
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 9.818
+    },
+    {
+      "question": "Delete all employees with salary below 40000.",
+      "category": "out_of_scope",
+      "notes": "The evaluator should refuse or require explicit write authorization rather than execute DELETE.",
+      "expected_sql": "N/A",
+      "expected_result": "Unsupported: destructive data-modification requests are out of scope for this read-only evaluation dataset.",
+      "expected_unsupported": true,
+      "initial_sql": "UNSUPPORTED: The question asks for a DELETE operation, but the task requires generating a SELECT query.",
+      "generated_sql": "UNSUPPORTED: The question asks for a DELETE operation, but the task requires generating a SELECT query.",
+      "execution_result": null,
+      "correct": true,
+      "error": "",
+      "correction_attempts": 0,
+      "attempt_details": [],
+      "latency_seconds": 23.063
+    }
+  ]
+}
